@@ -1,6 +1,21 @@
-import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:snapper/widgets/CustomSlider.dart';
+import 'package:window_manager/window_manager.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+
+  windowManager.waitUntilReadyToShow().then((_) async {
+    await windowManager.setTitle("Snapper");
+    await windowManager.setTitleBarStyle(TitleBarStyle.normal);
+    await windowManager.setBackgroundColor(Colors.transparent);
+    await windowManager.setMinimumSize(const Size(755, 700));
+    await windowManager.setSize(const Size(1100, 700));
+    await windowManager.center();
+    await windowManager.show();
+    await windowManager.setSkipTaskbar(false);
+  });
   runApp(const MyApp());
 }
 
@@ -10,21 +25,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+    return FluentApp(
+      debugShowCheckedModeBanner: false,
+      title: "Snapper",
+      theme: FluentThemeData(
+        brightness: Brightness.light,
+        accentColor: Colors.red,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      darkTheme: FluentThemeData(
+        brightness: Brightness.dark,
+        accentColor: Colors.red,
+      ),
+      home: const MyHomePage(title: ""),
     );
   }
 }
@@ -32,84 +44,169 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class _MyHomePageState extends State<MyHomePage> with WindowListener {
+  var index = 0;
+  double paddingValue = 0;
+  double insetValue = 0;
+  double raidusValue = 0;
+  double shadowValue = 0;
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+    return NavigationView(
+      content: Row(children: [
+        Acrylic(
+          child: Container(
+            width: 300,
+            height: MediaQuery.of(context).size.height,
+            color: const Color(0xffFF9595).withOpacity(0.14),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 15,
+                vertical: 20,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CustomSlider(title: "Padding", value: paddingValue),
+                  CustomSlider(title: "Border Radius", value: raidusValue),
+                  CustomSlider(title: "Inset", value: insetValue),
+                  CustomSlider(title: "Shadow", value: shadowValue),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  const Text("Background"),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: const [
+                      ColorWidget(colors: [
+                        Color(0xffFC3B3B),
+                        Color(0xffF66565),
+                        Color(0xffEE9999),
+                        Color(0xffEE9A9A),
+                      ]),
+                      ColorWidget(colors: [
+                        Color(0xffFF8A00),
+                        Color(0xffFAC715),
+                      ]),
+                      ColorWidget(colors: [
+                        Color(0xff56E9FD),
+                        Color(0xff337E88),
+                      ]),
+                      ColorWidget(colors: [
+                        Color(0xffA10EFB),
+                        Color(0xff006ED3),
+                        Color(0xff6957C0),
+                        Color(0xffEF39A6),
+                      ])
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: const [
+                      ColorWidget(colors: [
+                        Color(0xffFC3B3B),
+                        Color(0xffF66565),
+                        Color(0xffEE9999),
+                        Color(0xffEE9A9A),
+                      ]),
+                      ColorWidget(colors: [
+                        Color(0xffFF8A00),
+                        Color(0xffFAC715),
+                      ]),
+                      ColorWidget(colors: [
+                        Color(0xff56E9FD),
+                        Color(0xff337E88),
+                      ]),
+                      ColorWidget(colors: [
+                        Color(0xffA10EFB),
+                        Color(0xff006ED3),
+                        Color(0xff6957C0),
+                        Color(0xffEF39A6),
+                      ])
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  const Text("Size"),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: const [
+                      Chip(
+                        text: Text("Twitter"),
+                      ),
+                      Chip(
+                        text: Text("Instagram"),
+                      ),
+                      Chip(
+                        text: Text("Facebook"),
+                      ),
+                      Chip(
+                        text: Text("LinkedIn"),
+                      ),
+                      Chip(
+                        text: Text("Snapchat"),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                ],
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        Flexible(
+          child: SizedBox(
+            child: Padding(
+              padding:EdgeInsets.all(30),
+              child: Container(
+                color: Colors.red,
+              ),
+            ),
+          ),
+        )
+      ]),
+      //
+    );
+  }
+}
+
+class ColorWidget extends StatelessWidget {
+  final List<Color> colors;
+  const ColorWidget({
+    super.key,
+    required this.colors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: colors,
+          ),
+          borderRadius: BorderRadius.circular(100)),
     );
   }
 }
