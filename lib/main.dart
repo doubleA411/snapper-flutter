@@ -1,6 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:provider/provider.dart';
 import 'package:snapper/widgets/CustomSlider.dart';
 import 'package:window_manager/window_manager.dart';
+
+import 'global_data.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,18 +28,21 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return FluentApp(
-      debugShowCheckedModeBanner: false,
-      title: "Snapper",
-      theme: FluentThemeData(
-        brightness: Brightness.light,
-        accentColor: Colors.red,
+    return ChangeNotifierProvider(
+      create: (context) => GlobalData(),
+      child: FluentApp(
+        debugShowCheckedModeBanner: false,
+        title: "Snapper",
+        theme: FluentThemeData(
+          brightness: Brightness.light,
+          accentColor: Colors.red,
+        ),
+        darkTheme: FluentThemeData(
+          brightness: Brightness.dark,
+          accentColor: Colors.red,
+        ),
+        home: const MyHomePage(title: ""),
       ),
-      darkTheme: FluentThemeData(
-        brightness: Brightness.dark,
-        accentColor: Colors.red,
-      ),
-      home: const MyHomePage(title: ""),
     );
   }
 }
@@ -52,13 +58,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> with WindowListener {
   var index = 0;
-  double paddingValue = 0;
-  double insetValue = 0;
-  double raidusValue = 0;
-  double shadowValue = 0;
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<GlobalData>(context, listen: false);
+    var paddingValue = provider.paddingValue;
+    var borderValue = provider.borderValue;
+    var shadowValue = provider.shadowValue;
     return NavigationView(
       content: Row(children: [
         Acrylic(
@@ -74,10 +80,18 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CustomSlider(title: "Padding", value: paddingValue),
-                  CustomSlider(title: "Border Radius", value: raidusValue),
-                  CustomSlider(title: "Inset", value: insetValue),
-                  CustomSlider(title: "Shadow", value: shadowValue),
+                  CustomSlider(
+                    title: "Padding",
+                    value: paddingValue,
+                  ),
+                  CustomSlider(
+                    title: "Border Radius",
+                    value: borderValue,
+                  ),
+                  CustomSlider(
+                    title: "Shadow",
+                    value: shadowValue,
+                  ),
                   const SizedBox(
                     height: 30,
                   ),
@@ -177,9 +191,14 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
         Flexible(
           child: SizedBox(
             child: Padding(
-              padding:EdgeInsets.all(30),
+              padding:
+                  EdgeInsets.all(Provider.of<GlobalData>(context).paddingValue),
               child: Container(
-                color: Colors.red,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(Provider.of<GlobalData>(
+                      context,
+                    ).borderValue),
+                    color: Colors.red),
               ),
             ),
           ),
