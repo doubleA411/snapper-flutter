@@ -198,7 +198,15 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                     borderRadius: BorderRadius.circular(Provider.of<GlobalData>(
                       context,
                     ).borderValue),
-                    color: Colors.red),
+                    color: Colors.red,
+                    boxShadow: [
+                      BoxShadow(
+                          color: const Color(0xff000000).withOpacity(0.5),
+                          blurRadius: 10.0,
+                          spreadRadius: 5.0,
+                          offset: Offset(
+                              provider.shadowValue, provider.shadowValue - 10))
+                    ]),
               ),
             ),
           ),
