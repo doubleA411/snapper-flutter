@@ -19,7 +19,14 @@ void main() async {
     await windowManager.show();
     await windowManager.setSkipTaskbar(false);
   });
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      Provider<GlobalData>(
+        create: (context) => GlobalData(),
+      )
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -61,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
-    var provider = Provider.of<GlobalData>(context, listen: false);
+    var provider = Provider.of<GlobalData>(context);
     var paddingValue = provider.paddingValue;
     var borderValue = provider.borderValue;
     var shadowValue = provider.shadowValue;
@@ -202,10 +209,11 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                     boxShadow: [
                       BoxShadow(
                           color: const Color(0xff000000).withOpacity(0.5),
-                          blurRadius: 10.0,
-                          spreadRadius: 5.0,
-                          offset: Offset(
-                              provider.shadowValue, provider.shadowValue - 10))
+                          blurRadius: 30.0,
+                          spreadRadius:
+                              Provider.of<GlobalData>(context, listen: false)
+                                  .shadowValue,
+                          offset: Offset(0, 0))
                     ]),
               ),
             ),

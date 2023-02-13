@@ -30,18 +30,25 @@ class _CustomSliderState extends State<CustomSlider> {
           children: [Text(widget.title)],
         ),
         Slider(
+            max: widget.title == "Shadow" ? 40.0 : 200.0,
             value: widget.value,
             onChanged: (v) {
               setState(() {
                 if (widget.title == "Padding") {
                   Provider.of<GlobalData>(context, listen: false).paddingValue =
                       v;
+                  Provider.of<GlobalData>(context, listen: false)
+                      .changePadding(v);
                 } else if (widget.title == "Border Radius") {
                   Provider.of<GlobalData>(context, listen: false).borderValue =
                       v;
+                  Provider.of<GlobalData>(context, listen: false)
+                      .changeBorder(v);
                 } else if (widget.title == "Shadow") {
                   Provider.of<GlobalData>(context, listen: false).shadowValue =
                       v;
+                  Provider.of<GlobalData>(context, listen: false)
+                      .changeShadow(v);
                 }
 
                 widget.value = v;
