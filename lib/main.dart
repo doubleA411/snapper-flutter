@@ -1,4 +1,9 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/rendering.dart';
+import 'package:pasteboard/pasteboard.dart';
 import 'package:provider/provider.dart';
 import 'package:snapper/widgets/CustomSlider.dart';
 import 'package:window_manager/window_manager.dart';
@@ -64,7 +69,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with WindowListener {
+  Future readImages() async {
+    final imageBytes = await Pasteboard.image;
+    return imageBytes;
+  }
+
   var index = 0;
+  // ignore: prefer_typing_uninitialized_variables
+  var img;
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +84,13 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
     var paddingValue = provider.paddingValue;
     var borderValue = provider.borderValue;
     var shadowValue = provider.shadowValue;
+
+    readImages().then((value) {
+      setState(() {
+        Provider.of<GlobalData>(context, listen: false).changeImg(value);
+      });
+    });
+
     return NavigationView(
       content: Row(children: [
         Acrylic(
@@ -108,22 +127,24 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [
-                      ColorWidget(colors: [
-                        Color(0xffFC3B3B),
-                        Color(0xffF66565),
-                        Color(0xffEE9999),
-                        Color(0xffEE9A9A),
-                      ]),
-                      ColorWidget(colors: [
+                    children: [
+                      ColorWidget(
+                        colors: const [
+                          Color(0xffFC3B3B),
+                          Color(0xffF66565),
+                          Color(0xffEE9999),
+                          Color(0xffEE9A9A),
+                        ],
+                      ),
+                      ColorWidget(colors: const [
                         Color(0xffFF8A00),
                         Color(0xffFAC715),
                       ]),
-                      ColorWidget(colors: [
+                      ColorWidget(colors: const [
                         Color(0xff56E9FD),
                         Color(0xff337E88),
                       ]),
-                      ColorWidget(colors: [
+                      ColorWidget(colors: const [
                         Color(0xffA10EFB),
                         Color(0xff006ED3),
                         Color(0xff6957C0),
@@ -200,21 +221,31 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
             child: Padding(
               padding:
                   EdgeInsets.all(Provider.of<GlobalData>(context).paddingValue),
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(Provider.of<GlobalData>(
-                      context,
-                    ).borderValue),
-                    color: Colors.red,
+              child: Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: Provider.of<GlobalData>(context).colorList1),
+                    borderRadius: BorderRadius.circular(
+                      Provider.of<GlobalData>(
+                        context,
+                      ).borderValue,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                          color: const Color(0xff000000).withOpacity(0.5),
-                          blurRadius: 30.0,
-                          spreadRadius:
-                              Provider.of<GlobalData>(context, listen: false)
-                                  .shadowValue,
-                          offset: Offset(0, 0))
-                    ]),
+                        color: const Color(0xff000000).withOpacity(0.5),
+                        blurRadius: 30.0,
+                        spreadRadius:
+                            Provider.of<GlobalData>(context, listen: false)
+                                .shadowValue,
+                        offset: const Offset(0, 0),
+                      ),
+                    ],
+                  ),
+                  child: provider.img != null
+                      ? Image.memory(provider.img)
+                      : Text("Add a screenshot"),
+                ),
               ),
             ),
           ),
@@ -225,7 +256,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
   }
 }
 
-class ColorWidget extends StatelessWidget {
+class ColorWidget extends StatefulWidget {
   final List<Color> colors;
   const ColorWidget({
     super.key,
@@ -233,15 +264,33 @@ class ColorWidget extends StatelessWidget {
   });
 
   @override
+  State<ColorWidget> createState() => _ColorWidgetState();
+}
+
+class _ColorWidgetState extends State<ColorWidget> {
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: colors,
-          ),
-          borderRadius: BorderRadius.circular(100)),
+    var tap = false;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          tap = true;
+        });
+        Provider.of<GlobalData>(context, listen: false)
+            .assignColor(widget.colors);
+      },
+      child: Container(
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+            border: tap == true
+                ? Border.all(width: 3, color: Colors.black)
+                : Border.all(width: 0, color: Colors.transparent),
+            gradient: LinearGradient(
+              colors: widget.colors,
+            ),
+            borderRadius: BorderRadius.circular(100)),
+      ),
     );
   }
 }
