@@ -77,6 +77,15 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
   var index = 0;
   // ignore: prefer_typing_uninitialized_variables
   var img;
+  @override
+  void initState() {
+    readImages().then((value) {
+      setState(() {
+        Provider.of<GlobalData>(context, listen: false).changeImg(value);
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,12 +93,6 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
     var paddingValue = provider.paddingValue;
     var borderValue = provider.borderValue;
     var shadowValue = provider.shadowValue;
-
-    // readImages().then((value) {
-    //   setState(() {
-    //     Provider.of<GlobalData>(context, listen: false).changeImg(value);
-    //   });
-    // });
 
     return NavigationView(
       content: Row(children: [
@@ -213,7 +216,9 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                   ),
                   const Spacer(),
                   Image.asset(
-                      "lib/assets/logo.png",width: 40,)
+                    "lib/assets/logo.png",
+                    width: 40,
+                  )
                 ],
               ),
             ),
@@ -252,11 +257,9 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                             offset: const Offset(0, 0),
                           ),
                         ],
-                        image: const DecorationImage(
+                        image: DecorationImage(
                           fit: BoxFit.fill,
-                          image: NetworkImage(
-                            "https://media.discordapp.net/attachments/745288811810127975/1079057307062784130/image.png?width=1193&height=671",
-                          ),
+                          image: MemoryImage(provider.img),
                         ),
                       ),
                     ),

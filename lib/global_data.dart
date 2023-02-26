@@ -14,7 +14,12 @@ class GlobalData extends ChangeNotifier {
       this.paddingValue = 70.0,
       this.shadowValue = 0.0,
       this.img,
-      this.colorList1 = const []});
+      this.colorList1 = const [
+        Color(0xffFC3B3B),
+        Color(0xffF66565),
+        Color(0xffEE9999),
+        Color(0xffEE9A9A),
+      ]});
 
   void changePadding(var newValue) {
     paddingValue = newValue;
