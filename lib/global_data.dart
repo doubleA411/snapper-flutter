@@ -10,8 +10,8 @@ class GlobalData extends ChangeNotifier {
   List<Color> colorList1 = [];
 
   GlobalData(
-      {this.borderValue = 0.0,
-      this.paddingValue = 0.0,
+      {this.borderValue = 10.0,
+      this.paddingValue = 70.0,
       this.shadowValue = 0.0,
       this.img,
       this.colorList1 = const []});

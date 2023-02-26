@@ -85,17 +85,17 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
     var borderValue = provider.borderValue;
     var shadowValue = provider.shadowValue;
 
-    readImages().then((value) {
-      setState(() {
-        Provider.of<GlobalData>(context, listen: false).changeImg(value);
-      });
-    });
+    // readImages().then((value) {
+    //   setState(() {
+    //     Provider.of<GlobalData>(context, listen: false).changeImg(value);
+    //   });
+    // });
 
     return NavigationView(
       content: Row(children: [
         Acrylic(
           child: Container(
-            width: 300,
+            width: 250,
             height: MediaQuery.of(context).size.height,
             color: const Color(0xffFF9595).withOpacity(0.14),
             child: Padding(
@@ -127,24 +127,24 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
+                    children: const [
                       ColorWidget(
-                        colors: const [
+                        colors: [
                           Color(0xffFC3B3B),
                           Color(0xffF66565),
                           Color(0xffEE9999),
                           Color(0xffEE9A9A),
                         ],
                       ),
-                      ColorWidget(colors: const [
+                      ColorWidget(colors: [
                         Color(0xffFF8A00),
                         Color(0xffFAC715),
                       ]),
-                      ColorWidget(colors: const [
+                      ColorWidget(colors: [
                         Color(0xff56E9FD),
                         Color(0xff337E88),
                       ]),
-                      ColorWidget(colors: const [
+                      ColorWidget(colors: [
                         Color(0xffA10EFB),
                         Color(0xff006ED3),
                         Color(0xff6957C0),
@@ -211,6 +211,9 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                   const SizedBox(
                     height: 10,
                   ),
+                  const Spacer(),
+                  Image.asset(
+                      "lib/assets/logo.png",width: 40,)
                 ],
               ),
             ),
@@ -218,34 +221,47 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
         ),
         Flexible(
           child: SizedBox(
-            child: Padding(
-              padding:
-                  EdgeInsets.all(Provider.of<GlobalData>(context).paddingValue),
-              child: Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: Provider.of<GlobalData>(context).colorList1),
-                    borderRadius: BorderRadius.circular(
-                      Provider.of<GlobalData>(
-                        context,
-                      ).borderValue,
+            child: Center(
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          colors: Provider.of<GlobalData>(context).colorList1),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xff000000).withOpacity(0.5),
-                        blurRadius: 30.0,
-                        spreadRadius:
-                            Provider.of<GlobalData>(context, listen: false)
-                                .shadowValue,
-                        offset: const Offset(0, 0),
-                      ),
-                    ],
                   ),
-                  child: provider.img != null
-                      ? Image.memory(provider.img)
-                      : Text("Add a screenshot"),
-                ),
+                  Padding(
+                    padding: EdgeInsets.all(
+                        Provider.of<GlobalData>(context).paddingValue),
+                    child: Container(
+                      key: const Key("image"),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(
+                          Provider.of<GlobalData>(
+                            context,
+                          ).borderValue,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.fromARGB(255, 87, 87, 87)
+                                .withOpacity(0.5),
+                            blurRadius: 40.0,
+                            spreadRadius:
+                                Provider.of<GlobalData>(context, listen: false)
+                                    .shadowValue,
+                            offset: const Offset(0, 0),
+                          ),
+                        ],
+                        image: const DecorationImage(
+                          fit: BoxFit.fill,
+                          image: NetworkImage(
+                            "https://media.discordapp.net/attachments/745288811810127975/1079057307062784130/image.png?width=1193&height=671",
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
           ),
