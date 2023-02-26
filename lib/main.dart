@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/rendering.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:provider/provider.dart';
 import 'package:snapper/widgets/CustomSlider.dart';
@@ -77,6 +75,7 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
   var index = 0;
   // ignore: prefer_typing_uninitialized_variables
   var img;
+
   @override
   void initState() {
     readImages().then((value) {
@@ -133,10 +132,8 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                     children: const [
                       ColorWidget(
                         colors: [
-                          Color(0xffFC3B3B),
-                          Color(0xffF66565),
-                          Color(0xffEE9999),
-                          Color(0xffEE9A9A),
+                          Color(0xffFE0944),
+                          Color(0xffFEAE96),
                         ],
                       ),
                       ColorWidget(colors: [
@@ -144,14 +141,12 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                         Color(0xffFAC715),
                       ]),
                       ColorWidget(colors: [
-                        Color(0xff56E9FD),
-                        Color(0xff337E88),
+                        Color(0xff4facfe),
+                        Color(0xff00f2fe),
                       ]),
                       ColorWidget(colors: [
-                        Color(0xffA10EFB),
-                        Color(0xff006ED3),
-                        Color(0xff6957C0),
-                        Color(0xffEF39A6),
+                        Color(0xff6a11cb),
+                        Color(0xff2575fc),
                       ])
                     ],
                   ),
@@ -162,24 +157,24 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: const [
                       ColorWidget(colors: [
-                        Color(0xffFC3B3B),
-                        Color(0xffF66565),
-                        Color(0xffEE9999),
-                        Color(0xffEE9A9A),
+                        Color(0xff020202),
+                        Color(0xff090909),
+                        Color(0xff0d0d0d),
+                        Color(0xff111111),
                       ]),
                       ColorWidget(colors: [
-                        Color(0xffFF8A00),
-                        Color(0xffFAC715),
+                        Color(0xff8693AB),
+                        Color(0xffBDD4E7),
                       ]),
                       ColorWidget(colors: [
-                        Color(0xff56E9FD),
-                        Color(0xff337E88),
+                        Color(0xffF1A7F1),
+                        Color(0xffFAD0C4),
                       ]),
                       ColorWidget(colors: [
-                        Color(0xffA10EFB),
-                        Color(0xff006ED3),
-                        Color(0xff6957C0),
-                        Color(0xffEF39A6),
+                        Color(0xffF9F9F8),
+                        Color(0xffE5E6E4),
+                        Color(0xffECECEB),
+                        Color(0xffF2F3F2),
                       ])
                     ],
                   ),
@@ -214,6 +209,24 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                   const SizedBox(
                     height: 10,
                   ),
+                  IconButton(
+                      icon: Row(
+                        children: const [
+                          Icon(FluentIcons.refresh),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Text("Refresh")
+                        ],
+                      ),
+                      onPressed: () {
+                        readImages().then((value) {
+                          setState(() {
+                            Provider.of<GlobalData>(context, listen: false)
+                                .changeImg(value);
+                          });
+                        });
+                      }),
                   const Spacer(),
                   Image.asset(
                     "lib/assets/logo.png",
@@ -248,19 +261,23 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Color.fromARGB(255, 87, 87, 87)
-                                .withOpacity(0.5),
-                            blurRadius: 40.0,
+                            color: Colors.black.withOpacity(0.5),
+                            blurRadius: 10.0,
                             spreadRadius:
                                 Provider.of<GlobalData>(context, listen: false)
                                     .shadowValue,
                             offset: const Offset(0, 0),
                           ),
                         ],
-                        image: DecorationImage(
-                          fit: BoxFit.fill,
-                          image: MemoryImage(provider.img),
-                        ),
+                        image: provider.img != null
+                            ? DecorationImage(
+                                fit: BoxFit.fill,
+                                image: MemoryImage(provider.img),
+                              )
+                            : const DecorationImage(
+                                fit: BoxFit.contain,
+                                image: AssetImage("lib/assets/logo-text.png"),
+                              ),
                       ),
                     ),
                   )
