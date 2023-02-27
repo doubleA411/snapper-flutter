@@ -1,8 +1,16 @@
 import 'dart:async';
+// import 'dart:html';
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/rendering.dart';
 import 'package:pasteboard/pasteboard.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:snapper/new_widget.dart';
 import 'package:snapper/widgets/CustomSlider.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -38,21 +46,27 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => GlobalData(),
-      child: FluentApp(
-        debugShowCheckedModeBanner: false,
-        title: "Snapper",
-        theme: FluentThemeData(
-          brightness: Brightness.light,
-          accentColor: Colors.red,
-        ),
-        darkTheme: FluentThemeData(
-          brightness: Brightness.dark,
-          accentColor: Colors.red,
-        ),
-        home: const MyHomePage(title: ""),
-      ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => GlobalData(),
+        )
+      ],
+      builder: (context, child) {
+        return FluentApp(
+          debugShowCheckedModeBanner: false,
+          title: "Snapper",
+          theme: FluentThemeData(
+            brightness: Brightness.light,
+            accentColor: Colors.red,
+          ),
+          darkTheme: FluentThemeData(
+            brightness: Brightness.dark,
+            accentColor: Colors.red,
+          ),
+          home: const MyHomePage(title: ""),
+        );
+      },
     );
   }
 }
@@ -67,9 +81,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with WindowListener {
+  final GlobalKey genKey = GlobalKey();
   Future readImages() async {
     final imageBytes = await Pasteboard.image;
     return imageBytes;
+  }
+
+  Future<void> takePicture() async {
+    final RenderRepaintBoundary boundary =
+        genKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    ui.Image image = await boundary.toImage();
+    final directory = (await getApplicationDocumentsDirectory()).path;
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    final ts = DateTime.now().millisecondsSinceEpoch.toString();
+    Uint8List pngBytes = byteData!.buffer.asUint8List();
+    File imgFile = File('$directory/screenshots/$ts.png');
+    imgFile.writeAsBytes(pngBytes);
   }
 
   var index = 0;
@@ -227,6 +254,21 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                           });
                         });
                       }),
+                  IconButton(
+                    icon: Row(
+                      children: const [
+                        Icon(FluentIcons.save),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text("Save Image")
+                      ],
+                    ),
+                    onPressed: () {
+                      takePicture().whenComplete(() => showSnackbar(
+                          context, const Snackbar(content: Text("Saved"))));
+                    },
+                  ),
                   const Spacer(),
                   Image.asset(
                     "lib/assets/logo.png",
@@ -238,53 +280,55 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
           ),
         ),
         Flexible(
-          child: SizedBox(
-            child: Center(
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          colors: Provider.of<GlobalData>(context).colorList1),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(
-                        Provider.of<GlobalData>(context).paddingValue),
-                    child: Container(
-                      key: const Key("image"),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(
-                          Provider.of<GlobalData>(
-                            context,
-                          ).borderValue,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            blurRadius: 10.0,
-                            spreadRadius:
-                                Provider.of<GlobalData>(context, listen: false)
-                                    .shadowValue,
-                            offset: const Offset(0, 0),
-                          ),
-                        ],
-                        image: provider.img != null
-                            ? DecorationImage(
-                                fit: BoxFit.fill,
-                                image: MemoryImage(provider.img),
-                              )
-                            : const DecorationImage(
-                                fit: BoxFit.contain,
-                                image: AssetImage("lib/assets/logo-text.png"),
-                              ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
+          child: RepaintBoundary(key: genKey, child: NewWidget()),
+          // child: SizedBox(
+          //   child: Center(
+          //     child: Stack(
+          //       children: [
+          //         Container(
+          //           decoration: BoxDecoration(
+          //             gradient: LinearGradient(
+          //                 colors: Provider.of<GlobalData>(context).colorList1),
+          //           ),
+          //         ),
+          //         Padding(
+          //           padding: EdgeInsets.all(
+          //               Provider.of<GlobalData>(context).paddingValue),
+          //           child: Container(
+          //             key: const Key("image"),
+          //             decoration: BoxDecoration(
+          //               borderRadius: BorderRadius.circular(
+          //                 Provider.of<GlobalData>(
+          //                   context,
+          //                 ).borderValue,
+          //               ),
+          //               boxShadow: [
+          //                 BoxShadow(
+          //                   color: Colors.black.withOpacity(0.5),
+          //                   blurRadius: 10.0,
+          //                   spreadRadius:
+          //                       Provider.of<GlobalData>(context, listen: false)
+          //                           .shadowValue,
+          //                   offset: const Offset(0, 0),
+          //                 ),
+          //               ],
+          //               image: provider.img != null
+          //                   ? DecorationImage(
+          //                       fit: BoxFit.fill,
+          //                       image: MemoryImage(provider.img),
+          //                       scale: 3,
+          //                     )
+          //                   : const DecorationImage(
+          //                       fit: BoxFit.contain,
+          //                       image: AssetImage("lib/assets/logo-text.png"),
+          //                     ),
+          //             ),
+          //           ),
+          //         )
+          //       ],
+          //     ),
+          //   ),
+          // ),
         )
       ]),
       //
