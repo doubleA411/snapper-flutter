@@ -243,7 +243,11 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                           SizedBox(
                             width: 5,
                           ),
-                          Text("Refresh")
+                          Text("Refresh"),
+                          Spacer(),
+                          Shortcuts(
+                            text: "Ctrl + R",
+                          )
                         ],
                       ),
                       onPressed: () {
@@ -261,7 +265,11 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
                         SizedBox(
                           width: 5,
                         ),
-                        Text("Save Image")
+                        Text("Save Image"),
+                        Spacer(),
+                        Shortcuts(
+                          text: "Ctrl + S",
+                        )
                       ],
                     ),
                     onPressed: () {
@@ -332,6 +340,30 @@ class _MyHomePageState extends State<MyHomePage> with WindowListener {
         )
       ]),
       //
+    );
+  }
+}
+
+class Shortcuts extends StatelessWidget {
+  const Shortcuts({
+    super.key,
+    required this.text,
+  });
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.red.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(5)),
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Text(
+          text,
+          style: const TextStyle(fontWeight: FontWeight.w500),
+        ),
+      ),
     );
   }
 }
